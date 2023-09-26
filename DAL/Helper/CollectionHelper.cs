@@ -1,18 +1,15 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace DAL
 {
     public static class MessageConvert
     {
         private static readonly JsonSerializerSettings Settings;
+
         static MessageConvert()
         {
             Settings = new JsonSerializerSettings
@@ -33,9 +30,7 @@ namespace DAL
 
         public static T DeserializeObject<T>(this string json)
         {
-
             return JsonConvert.DeserializeObject<T>(json, Settings);
-
         }
 
         public static Object DeserializeObject(this string json, Type type)
@@ -50,6 +45,7 @@ namespace DAL
             }
         }
     }
+
     public static class CollectionHelper
     {
         private static string GetExcelColumnName(int columnNumber)
@@ -66,14 +62,17 @@ namespace DAL
             }
             return columnName;
         }
+
         public static object GetPropertyValue(this object T, string propName)
         {
             return T.GetType().GetProperty(propName) == null ? null : T.GetType().GetProperty(propName).GetValue(T, null);
         }
+
         public static string GetPropertyValueToString(this object T, string propName)
         {
             return T.GetType().GetProperty(propName) == null ? "" : Convert.ToString(T.GetType().GetProperty(propName).GetValue(T, null));
         }
+
         public static List<T> GetSourceWithPaging<T>(IEnumerable<T> source, int pageSize, int pageIndex, ref int totalPage)
         {
             var enumerable = source as T[] ?? source.ToArray();
@@ -109,6 +108,7 @@ namespace DAL
 
             return table;
         }
+
         public static IList<T> ConvertTo<T>(IList<DataRow> rows)
         {
             IList<T> list = null;
@@ -126,6 +126,7 @@ namespace DAL
 
             return list;
         }
+
         public static IList<T> ConvertTo<T>(this DataTable table)
         {
             if (table == null)
@@ -142,6 +143,7 @@ namespace DAL
 
             return ConvertTo<T>(rows);
         }
+
         public static T CreateItem<T>(DataRow row)
         {
             T obj = default(T);
@@ -176,22 +178,26 @@ namespace DAL
                                 var safeValue = (value == null) ? null : Convert.ChangeType(value, t);
                                 prop.SetValue(obj, safeValue, null);
                             }
+                            else if (type.Name == "Int32")
+                            {
+                                prop.SetValue(obj, Convert.ToInt32(value), null);
+                            }
                             else
                             {
                                 prop.SetValue(obj, value, null);
                             }
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         // You can log something here
                         throw;
                     }
                 }
             }
-
             return obj;
         }
+
         public static DataTable CreateTable<T>()
         {
             Type entityType = typeof(T);

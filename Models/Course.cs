@@ -1,4 +1,4 @@
-﻿namespace server.Models
+﻿namespace Models
 {
     public class Course
     {

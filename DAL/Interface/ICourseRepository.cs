@@ -1,9 +1,9 @@
-﻿using server.Models;
+﻿using Models;
 
 namespace DAL.Interface
 {
-    public partial interface ICourseRepository
+    public interface ICourseRepository
     {
-        public bool Create(Course course);
+        public Task<bool> Create(Course course);
     }
 }

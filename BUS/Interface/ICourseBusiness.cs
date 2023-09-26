@@ -1,9 +1,9 @@
-﻿using server.Models;
+﻿using Models;
 
 namespace BUS.Interface
 {
     public partial interface ICourseBusiness
     {
-        public bool Create(Course course);
+        public Task<bool> Create(Course course);
     }
 }

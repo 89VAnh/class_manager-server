@@ -1,35 +1,42 @@
-﻿using BUS.Interface;
+﻿using BUS.Classes;
+using BUS.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using server.Classes;
-using server.Untility;
 
 namespace server.Controllers
 {
+    [Authorize]
     [Produces("application/json")]
     [ApiController]
+    [Route("[controller]")]
     public class FilesController : ControllerBase
     {
         private ICourseBusiness _courseBusiness;
+        private IClassBusiness _classBusiness;
+        private ITranscriptBusiness _transcriptBusiness;
 
-        public FilesController(ICourseBusiness courseBusiness)
+        public FilesController(ICourseBusiness courseBusiness, IClassBusiness classBusiness, ITranscriptBusiness transcriptBusiness)
         {
             _courseBusiness = courseBusiness;
+            _classBusiness = classBusiness;
+            _transcriptBusiness = transcriptBusiness;
         }
 
         [HttpPost]
-        [Route("UploadFile")]
-        public async Task<IActionResult> UploadFile(IFormFile file)
+        [Route("Transcript")]
+        public async Task<IActionResult> UploadTranscriptFile(IFormFile file, string classId, int Semester, string SchoolYear)
         {
             string fileName = file.FileName;
-            if (await Tools.CheckTranscriptFileName(fileName))
+
+            if (Path.GetExtension(fileName).ToLower() == ".xlsx")
             {
-                Excel excel = new Excel(file, _courseBusiness);
-                if (!await excel.LoadToDB())
+                Excel excel = new Excel(file);
+                if (!await excel.LoadToDB(_courseBusiness, _classBusiness, _transcriptBusiness, classId, Semester, SchoolYear))
                 {
-                    return BadRequest($"Không đọc được file {fileName}");
+                    return BadRequest($"Không đọc được file {fileName}!");
                 }
             }
-            else return BadRequest($"Vui lòng chọn file có tên đúng định dạng <tên lớp> <học kỳ>.Xlsx (VD: 125211 HK2.Xlsx)");
+            else return BadRequest($"Vui lòng chọn file excel có định dạng .xlsx");
 
             return Ok($"Tải lên file '{fileName}' thành công!");
         }

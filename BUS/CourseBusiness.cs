@@ -1,6 +1,6 @@
 ﻿using BUS.Interface;
 using DAL.Interface;
-using server.Models;
+using Models;
 
 namespace BUS
 {
@@ -13,9 +13,9 @@ namespace BUS
             _res = res;
         }
 
-        public bool Create(Course course)
+        public async Task<bool> Create(Course course)
         {
-            return _res.Create(course);
+            return await _res.Create(course);
         }
     }
 }
